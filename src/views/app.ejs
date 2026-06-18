@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title || 'Welcome' %></title>
+<style>
+    .error-banner {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #fee2e2;
+        color: #dc2626;
+        border: 1.5px solid #fca5a5;
+        border-radius: 10px;
+        padding: 11px 16px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 14px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: #f0f2f8;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .container {
+        display: flex;
+        width: 900px;
+        max-width: 98vw;
+        min-height: 560px;
+        background: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 8px 40px rgba(80,80,160,0.10);
+    }
+
+    /* ── Left panel ── */
+    .left-panel {
+        flex: 1;
+        background: linear-gradient(145deg, #e8eaf6 0%, #c5cae9 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 40px 36px 32px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .brand-headline h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #3730a3;
+        line-height: 1.2;
+    }
+
+    .brand-headline h1 span {
+        color: #4f46e5;
+    }
+
+    .brand-headline p {
+        margin-top: 12px;
+        font-size: 0.85rem;
+        color: #5c5f80;
+        line-height: 1.6;
+        max-width: 240px;
+    }
+
+    .hero-illustration {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .hero-illustration svg {
+        width: 220px;
+        height: 220px;
+    }
+
+    .badge {
+        position: absolute;
+        bottom: 24px;
+        left: 24px;
+        background: #4f46e5;
+        color: #fff;
+        border-radius: 10px;
+        padding: 8px 14px;
+        font-size: 0.78rem;
+        font-weight: 500;
+        line-height: 1.4;
+        box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+    }
+
+    .badge .amount { font-size: 1rem; font-weight: 700; }
+
+    .features {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+        color: #3730a3;
+        font-weight: 500;
+    }
+
+    .feature-item .dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: #4f46e5;
+        flex-shrink: 0;
+    }
+
+    /* ── Right panel ── */
+    .right-panel {
+        flex: 1.1;
+        padding: 36px 44px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Tab switcher */
+    .tab-switcher {
+        display: flex;
+        justify-content: flex-end;
+        gap: 6px;
+        margin-bottom: 32px;
+    }
+
+    .tab-btn {
+        padding: 7px 22px;
+        border-radius: 8px;
+        border: 1.5px solid #4f46e5;
+        font-size: 0.88rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.18s, color 0.18s;
+        background: transparent;
+        color: #4f46e5;
+    }
+
+    .tab-btn.active {
+        background: #4f46e5;
+        color: #fff;
+    }
+
+    .form-heading {
+        text-align: center;
+        margin-bottom: 8px;
+    }
+
+    .form-heading h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e1b4b;
+    }
+
+    .form-heading p {
+        font-size: 0.82rem;
+        color: #6b7280;
+        margin-top: 4px;
+    }
+
+    /* Alert messages */
+    .alert {
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 0.83rem;
+        margin-bottom: 14px;
+    }
+    .alert-error   { background: #fee2e2; color: #991b1b; }
+    .alert-success { background: #d1fae5; color: #065f46; }
+
+    /* Form */
+    .auth-form { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
+
+    .field label {
+        display: block;
+        font-size: 0.8rem;
+        color: #374151;
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+
+    .field input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1.5px solid #d1d5db;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        color: #111827;
+        background: #f9fafb;
+        outline: none;
+        transition: border-color 0.18s, box-shadow 0.18s;
+    }
+
+    .field input:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79,70,229,0.12);
+        background: #fff;
+    }
+
+    .field input::placeholder { color: #9ca3af; }
+
+    .password-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+
+    .password-row label { font-size: 0.8rem; color: #374151; font-weight: 500; }
+
+    .forgot-link {
+        font-size: 0.78rem;
+        color: #4f46e5;
+        text-decoration: none;
+    }
+    .forgot-link:hover { text-decoration: underline; }
+
+    .input-wrap { position: relative; }
+
+    .input-wrap input { padding-right: 42px; }
+
+    .toggle-pw {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #9ca3af;
+        font-size: 1.1rem;
+        line-height: 1;
+        padding: 0;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 12px;
+        background: #22c55e;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 4px;
+        transition: background 0.18s, transform 0.1s;
+    }
+
+    .submit-btn:hover  { background: #16a34a; }
+    .submit-btn:active { transform: scale(0.98); }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #9ca3af;
+        font-size: 0.8rem;
+        margin: 4px 0;
+    }
+
+    .divider::before, .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #e5e7eb;
+    }
+
+    .social-row { display: flex; gap: 10px; }
+
+    .social-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border: 1.5px solid #d1d5db;
+        border-radius: 10px;
+        background: #fff;
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: #374151;
+        cursor: pointer;
+        text-decoration: none;
+        transition: border-color 0.18s, background 0.18s;
+    }
+
+    .social-btn:hover { border-color: #4f46e5; background: #f5f3ff; }
+
+    .social-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    .switch-text {
+        text-align: center;
+        font-size: 0.82rem;
+        color: #6b7280;
+        margin-top: 8px;
+    }
+
+    .switch-text a { color: #4f46e5; text-decoration: none; font-weight: 500; }
+    .switch-text a:hover { text-decoration: underline; }
+    
+    /* Show/hide panels */
+    .form-panel { display: none; }
+    .form-panel.active { display: block; }
+    
+    /* Responsive */
+    @media (max-width: 680px) {
+        .container { flex-direction: column; border-radius: 0; min-height: 100vh; }
+        .left-panel { min-height: 200px; padding: 28px 24px 20px; }
+        .hero-illustration { display: none; }
+        .right-panel { padding: 28px 22px; }
+    }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- ── LEFT PANEL ── -->
+        <div class="left-panel">
+            <div class="brand-headline">
+                <h1>Your Money <span>.</span><br>Smarter, Safer</h1>
+                <p>Manage your finances with confidence. Track, transfer, and grow your money all in one place.</p>
+            </div>
+            
+            <div class="hero-illustration">
+                <!-- Simple SVG illustration placeholder -->
+                <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="100" r="90" fill="#c7d2fe" opacity="0.5"/>
+            <ellipse cx="100" cy="165" rx="55" ry="14" fill="#a5b4fc" opacity="0.4"/>
+            <!-- Bean bag -->
+            <ellipse cx="100" cy="148" rx="50" ry="32" fill="#ea580c"/>
+            <ellipse cx="100" cy="136" rx="44" ry="28" fill="#f97316"/>
+            <!-- Person body -->
+            <rect x="72" y="90" width="56" height="52" rx="10" fill="#fff"/>
+            <!-- Person head -->
+            <circle cx="100" cy="78" r="22" fill="#fcd34d"/>
+            <!-- Laptop -->
+            <rect x="68" y="112" width="64" height="38" rx="5" fill="#e0e7ff"/>
+            <rect x="72" y="116" width="56" height="28" rx="3" fill="#818cf8"/>
+            <!-- Arms up -->
+            <line x1="72" y1="100" x2="50" y2="76" stroke="#fcd34d" stroke-width="8" stroke-linecap="round"/>
+            <line x1="128" y1="100" x2="150" y2="76" stroke="#fcd34d" stroke-width="8" stroke-linecap="round"/>
+        </svg>
+        
+        <div class="badge">
+            <div class="amount">Balance: $450,000</div>
+            <div>Transfer Successful ✓</div>
+        </div>
+    </div>
+    
+    <div class="features">
+        <div class="feature-item"><span class="dot"></span> Bank Level Security</div>
+        <div class="feature-item"><span class="dot"></span> Instant Transfers</div>
+        <div class="feature-item"><span class="dot"></span> Smart Insights</div>
+    </div>
+        </div>
+
+<!-- ── RIGHT PANEL ── -->
+<div class="right-panel">
+    
+    <!-- Tab switcher -->
+    <div class="tab-switcher">
+        <button class="tab-btn" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+        <button class="tab-btn" id="tab-login" onclick="switchTab('login')">Login</button>
+    </div>
+    
+    <!-- Flash messages from Express (optional) -->
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-error"><%= error %></div>
+        <% } %>
+        <% if (typeof success !== 'undefined' && success) { %>
+            <div class="alert alert-success"><%= success %></div>
+    <% } %>
+            
+    <!-- ── SIGNUP FORM ── -->
+    <div class="form-panel" id="panel-signup">
+        <div class="form-heading">
+            <h2>Create Account</h2>
+            <p>Join thousands managing their finances smarter</p>
+        </div>
+            <% if (typeof query !== 'undefined' && query.error === 'email_exists') { %>
+                    <div class="error-banner">
+                        ⓘ Account already exists with this email
+                    </div>
+            <% } %>
+            <form class="auth-form" action="/auth/register" method="POST">
+                <div class="field">
+                    <label for="signup-name">Full Name</label>
+                    <input
+                    type="text"
+                    id="signup-name"
+                    name="name"
+                    placeholder="Enter your full name"
+                    required
+                    />
+                </div>
+            
+                <div class="field">
+                    <label for="signup-email">Email Address</label>
+                    <input
+                    type="email"
+                    id="signup-email"
+                    name="email"
+                    placeholder="you@example.com"
+                    required
+                    />
+                </div>
+            
+                <div class="field">
+                    <label for="signup-password">Password</label>
+                    <div class="input-wrap">
+                    <input
+                        type="password"
+                        id="signup-password"
+                        name="password"
+                        placeholder="Create a strong password"
+                        required
+                    />
+                    <button type="button" class="toggle-pw" onclick="togglePw('signup-password', this)" aria-label="Show password">
+                        👁
+                    </button>
+                    </div>
+                </div>
+            
+                <div class="field">
+                    <label for="signup-confirm">Confirm Password</label>
+                    <div class="input-wrap">
+                    <input
+                        type="password"
+                        id="signup-confirm"
+                        name="confirmPassword"
+                        placeholder="Re-enter your password"
+                        required
+                    />
+                    <button type="button" class="toggle-pw" onclick="togglePw('signup-confirm', this)" aria-label="Show password">
+                        👁
+                    </button>
+                    </div>
+                </div>
+            
+                <button type="submit" class="submit-btn">Create Account</button>
+            
+                <!-- <div class="divider">or</div>
+            
+                <div class="social-row">
+                    <a href="/auth/google" class="social-btn">
+                    <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+                        <path d="M9 18c2.43 0 4.467-.806 5.956-2.185l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+                        <path d="M3.964 10.706A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="#FBBC05"/>
+                        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+                    </svg>
+                    Sign up with Google
+                    </a>
+                </div> -->
+            
+                <p class="switch-text">
+                    Already have an account? <a href="#" onclick="switchTab('login'); return false;">Log in</a>
+                </p>
+            </form>
+    </div>
+
+            <!-- ── LOGIN FORM ── -->
+    <div class="form-panel" id="panel-login">
+        <div class="form-heading">
+            <h2>Welcome Back</h2>
+            <p>Log in to continue managing your finances</p>
+        </div>
+
+        <% if (typeof query !== 'undefined' && query.error === 'user_not_found') { %>
+        <div class="error-banner">
+            ⓘ Account does not exist with this email
+        </div>
+        <% } %>
+        <% if (typeof query !== 'undefined' && query.error === 'wrong_password') { %>
+        <div class="error-banner">
+            ⓘ Incorrect password, please try again
+        </div>
+        <% } %>
+        <% if (typeof query !== 'undefined' && query.success === 'password_reset') { %>
+            <div style="display:flex; align-items:center; gap:8px; background:rgba(34,197,94,0.12); color:#86efac; border:1px solid rgba(34,197,94,0.25); border-radius:10px; padding:11px 16px; font-size:0.85rem; font-weight:500; margin-bottom:14px;">
+                ✓ Password reset successfully. Please log in.
+            </div>
+        <% } %>
+
+        <form class="auth-form" action="/auth/login" method="POST">
+            <div class="field">
+            <label for="login-identifier">Email</label>
+            <input
+                type="text"
+                id="login-identifier"
+                name="email"
+                placeholder="Enter your email or username"
+                value="<%= typeof formData !== 'undefined' ? formData.identifier || '' : '' %>"
+                required
+            />
+            </div>
+
+            <div class="field">
+            <div class="password-row">
+                <label for="login-password">Password</label>
+                <a href="/auth/forgot-password" class="forgot-link">Forgot password?</a>
+            </div>
+            <div class="input-wrap">
+                <input
+                type="password"
+                id="login-password"
+                name="password"
+                placeholder="••••••••••"
+                required
+                />
+                <button type="button" class="toggle-pw" onclick="togglePw('login-password', this)" aria-label="Show password">
+                👁
+                </button>
+            </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Login</button>
+
+            <div class="divider">or</div>
+
+        <!-- <div class="social-row">
+            <a href="/auth/google" class="social-btn"> -->
+                <!-- Google icon -->
+                <!-- <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+                <path d="M9 18c2.43 0 4.467-.806 5.956-2.185l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+                <path d="M3.964 10.706A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="#FBBC05"/>
+                <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+                </svg>
+                Login with Google
+            </a>
+        </div> -->
+
+        <p class="switch-text">
+            Don't have an account? <a href="#" onclick="switchTab('signup'); return false;">Create one</a>
+        </p>
+        </form>
+    </div>
+
+
+    </div><!-- /right-panel -->
+</div><!-- /container -->
+
+<script>
+    switchTab('<%= activeTab || "login" %>');
+    function switchTab(tab) {
+        document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('panel-' + tab).classList.add('active');
+        document.getElementById('tab-' + tab).classList.add('active');
+
+        // Update URL without reloading the page
+        const url = tab === 'login' ? '/login' : '/';
+        window.history.pushState({}, '', url);
+    }
+
+    function togglePw(inputId, btn) {
+    var input = document.getElementById(inputId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.style.opacity = '1';
+    } else {
+        input.type = 'password';
+        btn.style.opacity = '0.5';
+    }
+    }
+
+    // Password match validation
+    const pwInput = document.getElementById('signup-password');
+    const confirmInput = document.getElementById('signup-confirm');
+    const signupBtn = document.querySelector('#panel-signup .submit-btn');
+
+    function validatePasswords() {
+    if (confirmInput.value.length === 0) {
+        confirmInput.style.borderColor = '#d1d5db';
+        confirmInput.style.boxShadow = 'none';
+        signupBtn.disabled = false;
+        signupBtn.style.opacity = '1';
+        return;
+    }
+
+    if (pwInput.value !== confirmInput.value) {
+        confirmInput.style.borderColor = '#ef4444';
+        confirmInput.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.15)';
+        signupBtn.disabled = true;
+        signupBtn.style.opacity = '0.5';
+        signupBtn.style.cursor = 'not-allowed';
+
+        // Show message if not already there
+        if (!document.getElementById('pw-mismatch-msg')) {
+        const msg = document.createElement('p');
+        msg.id = 'pw-mismatch-msg';
+        msg.textContent = '⚠ Passwords do not match';
+        msg.style.cssText = 'color:#ef4444; font-size:0.78rem; margin-top:4px;';
+        confirmInput.parentElement.insertAdjacentElement('afterend', msg);
+        }
+    } else {
+        confirmInput.style.borderColor = '#22c55e';
+        confirmInput.style.boxShadow = '0 0 0 3px rgba(34,197,94,0.15)';
+        signupBtn.disabled = false;
+        signupBtn.style.opacity = '1';
+        signupBtn.style.cursor = 'pointer';
+
+        // Remove mismatch message if present
+        const msg = document.getElementById('pw-mismatch-msg');
+        if (msg) msg.remove();
+    }
+    }
+
+    confirmInput.addEventListener('input', validatePasswords);
+    pwInput.addEventListener('input', validatePasswords);
+
+    // Password length validation
+    const pwInput2 = document.getElementById('signup-password');
+    const signupBtn2 = document.querySelector('#panel-signup .submit-btn');
+
+    pwInput2.addEventListener('input', function () {
+    // Remove old message if exists
+    const old = document.getElementById('pw-length-msg');
+    if (old) old.remove();
+
+    if (pwInput2.value.length === 0) {
+        pwInput2.style.borderColor = '#d1d5db';
+        pwInput2.style.boxShadow = 'none';
+        return;
+    }
+
+    if (pwInput2.value.length < 6) {
+        pwInput2.style.borderColor = '#ef4444';
+        pwInput2.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.15)';
+        signupBtn2.disabled = true;
+        signupBtn2.style.opacity = '0.5';
+        signupBtn2.style.cursor = 'not-allowed';
+
+        const msg = document.createElement('p');
+        msg.id = 'pw-length-msg';
+        msg.textContent = '⚠ Password must be atleast 6 characters';
+        msg.style.cssText = 'color:#ef4444; font-size:0.78rem; margin-top:4px;';
+        pwInput2.parentElement.insertAdjacentElement('afterend', msg);
+    } else {
+        pwInput2.style.borderColor = '#22c55e';
+        pwInput2.style.boxShadow = '0 0 0 3px rgba(34,197,94,0.15)';
+        signupBtn2.disabled = false;
+        signupBtn2.style.opacity = '1';
+        signupBtn2.style.cursor = 'pointer';
+    }
+    });
+
+    // To prevent from going back by back nav button on site
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            window.location.replace('/login');
+        }
+    });
+</script>
+
+</body>
+</html>

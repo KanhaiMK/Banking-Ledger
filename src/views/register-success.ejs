@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Account Created Successfully</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: #f0f2f8;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        }
+
+        /* ── Top banner ── */
+        .top-banner {
+        width: 100%;
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        padding: 22px 24px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(34,197,94,0.25);
+        }
+
+        .top-banner h1 {
+        color: #fff;
+        font-size: 1.35rem;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        }
+
+        .top-banner p {
+        color: #bbf7d0;
+        font-size: 0.85rem;
+        margin-top: 4px;
+        }
+
+        /* ── Card ── */
+        .card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 8px 40px rgba(80,80,160,0.10);
+        padding: 48px 44px 40px;
+        max-width: 480px;
+        width: 90%;
+        margin-top: 60px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        }
+
+        .card::before {
+        content: '';
+        position: absolute;
+        top: -60px; right: -60px;
+        width: 180px; height: 180px;
+        background: radial-gradient(circle, #dcfce7 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+        }
+
+        .card::after {
+        content: '';
+        position: absolute;
+        bottom: -50px; left: -50px;
+        width: 150px; height: 150px;
+        background: radial-gradient(circle, #d1fae5 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+        }
+
+        /* ── Animated checkmark icon ── */
+        .icon-wrap {
+        width: 84px; height: 84px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #bbf7d0, #86efac);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        box-shadow: 0 4px 20px rgba(34,197,94,0.25);
+        animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+        }
+
+        @keyframes pop {
+        0%   { transform: scale(0); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+        }
+
+        .icon-wrap svg {
+        width: 42px; height: 42px;
+        animation: draw 0.6s ease 0.3s both;
+        }
+
+        @keyframes draw {
+        0%   { opacity: 0; transform: scale(0.5); }
+        100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* ── Text ── */
+        .card h2 {
+        font-size: 1.45rem;
+        font-weight: 700;
+        color: #1e1b4b;
+        margin-bottom: 10px;
+        }
+
+        .name-badge {
+        display: inline-block;
+        background: #dcfce7;
+        color: #16a34a;
+        font-size: 0.88rem;
+        font-weight: 600;
+        padding: 5px 16px;
+        border-radius: 99px;
+        margin-bottom: 8px;
+        }
+
+        .email-badge {
+        display: inline-block;
+        background: #ede9fe;
+        color: #4f46e5;
+        font-size: 0.82rem;
+        font-weight: 500;
+        padding: 4px 14px;
+        border-radius: 99px;
+        margin-bottom: 18px;
+        }
+
+        .card p {
+        font-size: 0.9rem;
+        color: #6b7280;
+        line-height: 1.65;
+        margin-bottom: 28px;
+        }
+
+        /* ── Buttons ── */
+        .btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        }
+
+        .btn-primary {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: opacity 0.18s, transform 0.1s;
+        }
+
+        .btn-primary:hover  { opacity: 0.9; }
+        .btn-primary:active { transform: scale(0.98); }
+
+        .btn-secondary {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        background: transparent;
+        color: #4f46e5;
+        border: 1.5px solid #4f46e5;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background 0.18s;
+        }
+
+        .btn-secondary:hover { background: #ede9fe; }
+
+        /* ── Countdown ── */
+        .redirect-note {
+        margin-top: 20px;
+        font-size: 0.78rem;
+        color: #9ca3af;
+        }
+
+        .redirect-note span {
+        font-weight: 600;
+        color: #16a34a;
+        }
+
+        /* ── Floating dots ── */
+        .dots {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+        }
+
+        .dot {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.18;
+        animation: float 8s ease-in-out infinite;
+        }
+
+        .dot:nth-child(1) { width:120px; height:120px; background:#86efac; top:10%; left:5%;  animation-delay:0s; }
+        .dot:nth-child(2) { width: 80px; height: 80px;  background:#6ee7b7; top:70%; left:80%; animation-delay:2s; }
+        .dot:nth-child(3) { width: 60px; height: 60px;  background:#a7f3d0; top:50%; left:15%; animation-delay:4s; }
+        .dot:nth-child(4) { width:100px; height:100px; background:#818cf8; top:20%; left:75%; animation-delay:1s; }
+
+        @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50%       { transform: translateY(-20px); }
+        }
+    </style>
+    </head>
+
+    <body>
+
+    <div class="dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+
+    <!-- Top banner -->
+    <div class="top-banner">
+        <h1>🎉 Account Created Successfully</h1>
+        <p>Welcome aboard! Your account is ready to use</p>
+    </div>
+
+    <!-- Main card -->
+    <div class="card">
+
+        <div class="icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 13L9 17L19 7" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        </div>
+
+        <h2>Welcome<% if (typeof name !== 'undefined' && name) { %>, <%= name %>!<% } else { %>!<% } %></h2>
+
+        <% if (typeof name !== 'undefined' && name) { %>
+        <div><span class="name-badge">👤 <%= name %></span></div>
+        <% } %>
+
+        <% if (typeof email !== 'undefined' && email) { %>
+        <div><span class="email-badge">✉ <%= email %></span></div>
+        <% } %>
+
+        <p>
+        Your account has been created successfully.<br/>
+        You can now log in and start managing your finances smarter and safer.
+        </p>
+
+        <div class="btn-group">
+        <a href="/" class="btn-secondary">Go to Home Page</a>
+        </div>
+    </div>
+
+    <<script>
+        let seconds = 5;
+        const el = document.getElementById('countdown');
+        const timer = setInterval(() => {
+            seconds--;
+            el.textContent = seconds;
+            if (seconds <= 0) {
+                clearInterval(timer);
+                window.location.href = '/auth/login';
+            }
+        }, 1000);
+        
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                window.location.replace('/login');
+            }
+        });
+    </script>
+
+    </body>
+</html>

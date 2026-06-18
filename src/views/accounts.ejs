@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Accounts – <%= typeof user !== 'undefined' ? user.name : 'Dashboard' %></title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a0533 0%, #2d0a4e 50%, #1a0533 100%);
+            min-height: 100vh;
+        }
+
+        /* ── Navbar ── */
+        .navbar {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 0 32px;
+            height: 66px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-size: 1.25rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #e879f9, #a855f7);
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 0.01em;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 16px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            font-size: 0.83rem;
+            font-weight: 500;
+            color: #d4b8f0;
+            cursor: pointer;
+            transition: background 0.18s, border-color 0.18s, color 0.18s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239,68,68,0.15);
+            border-color: #ef4444;
+            color: #fca5a5;
+        }
+
+        .greeting {
+            font-size: 0.9rem;
+            color: #c4b5fd;
+            font-weight: 400;
+        }
+
+        .greeting strong {
+            color: #f0e6ff;
+            font-weight: 600;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e879f9, #a855f7);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+            transition: box-shadow 0.18s, transform 0.15s;
+            flex-shrink: 0;
+            user-select: none;
+            box-shadow: 0 0 0 2px rgba(232,121,249,0.3);
+        }
+
+        .avatar:hover {
+            box-shadow: 0 0 0 4px rgba(232,121,249,0.4);
+            transform: scale(1.06);
+        }
+
+        /* ── Banner images ── */
+        .banner {
+            display: flex;
+            gap: 16px;
+            padding: 24px 32px 0;
+        }
+
+        .banner img {
+            width: 50%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 16px;
+            border: 1px solid rgba(232,121,249,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        /* ── Main content ── */
+        .main {
+            max-width: 740px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Error banner */
+        .error-banner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(239,68,68,0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        /* Section header */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #f0e6ff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            user-select: none;
+        }
+
+        .section-title .chevron {
+            font-size: 0.9rem;
+            color: #a855f7;
+            transition: transform 0.25s;
+            display: inline-block;
+        }
+
+        .section-title.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Accounts list */
+        .accounts-list {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .accounts-list.visible { display: flex; }
+
+        /* Loading / empty state */
+        .state-msg {
+            text-align: center;
+            padding: 36px 0;
+            color: #9d7fc4;
+            font-size: 0.88rem;
+        }
+
+        .state-msg .icon { font-size: 2rem; margin-bottom: 8px; }
+
+        /* Account card */
+        .account-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(168,85,247,0.25);
+            border-radius: 16px;
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            text-decoration: none;
+            transition: border-color 0.18s, box-shadow 0.18s, transform 0.15s, background 0.18s;
+            backdrop-filter: blur(8px);
+        }
+
+        .account-card:hover {
+            border-color: #e879f9;
+            background: rgba(232,121,249,0.08);
+            box-shadow: 0 4px 24px rgba(168,85,247,0.2);
+            transform: translateY(-2px);
+        }
+
+        .account-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .account-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(232,121,249,0.2), rgba(168,85,247,0.2));
+            border: 1px solid rgba(232,121,249,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .account-info .account-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #f0e6ff;
+        }
+
+        .account-info .account-number {
+            font-size: 0.78rem;
+            color: #9d7fc4;
+            margin-top: 3px;
+            font-family: monospace;
+            letter-spacing: 0.05em;
+        }
+
+        .account-right {
+            text-align: right;
+        }
+
+        .account-arrow {
+            color: #7e3fb0;
+            font-size: 1.3rem;
+            margin-left: 14px;
+            transition: color 0.18s;
+        }
+
+        .account-card:hover .account-arrow { color: #e879f9; }
+
+        /* Create button */
+        .create-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 26px;
+            background: linear-gradient(135deg, #e879f9, #a855f7);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.18s, transform 0.15s, box-shadow 0.18s;
+            box-shadow: 0 4px 20px rgba(168,85,247,0.35);
+            margin-top: 8px;
+        }
+
+        .create-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 28px rgba(168,85,247,0.45);
+        }
+
+        .create-btn:active { transform: scale(0.98); }
+    </style>
+</head>
+<body>
+
+    <!-- ── Navbar ── -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <h2>💳 MK_Bank</h1>
+        </div>
+
+        <div class="navbar-right">
+            <form action="/auth/logout" method="POST">
+                <button type="submit" class="logout-btn">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    Logout
+                </button>
+            </form>
+
+            <span class="greeting">Hi, <strong><%= typeof user !== 'undefined' ? user.name : 'there' %></strong></span>
+
+            <a href="/profile" class="avatar" title="View Profile">
+                <% if (typeof user !== 'undefined' && user.profilePicture) { %>
+                    <img src="<%= user.profilePicture %>" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />
+                <% } else { %>
+                    <%= typeof user !== 'undefined' ? user.name.charAt(0).toUpperCase() : 'U' %>
+                <% } %>
+            </a>
+        </div>
+    </nav>
+
+    <!-- ── Banner images ── -->
+    <div class="banner">
+        <img src="/images/uploads/bank.jpg"  alt="Bank" />
+        <img src="/images/uploads/bank2.jpg" alt="Bank" />
+    </div>
+
+    <!-- ── Main ── -->
+    <div class="main">
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="error-banner">ⓘ <%= error %></div>
+        <% } %>
+
+        <div class="section-header">
+            <div class="section-title" id="accounts-toggle" onclick="toggleAccounts()">
+                Accounts
+                <span class="chevron">▼</span>
+            </div>
+        </div>
+
+        <div class="accounts-list" id="accounts-list">
+            <div class="state-msg" id="accounts-state">
+                <div class="icon">⏳</div>
+                Loading your accounts...
+            </div>
+        </div>
+
+        <form action="/accounts/create" method="POST">
+            <button type="submit" class="create-btn">
+                + Create New Account
+            </button>
+        </form>
+
+    </div>
+
+    <script>
+        let loaded = false;
+        let isOpen = false;
+
+        function toggleAccounts() {
+            const list = document.getElementById('accounts-list');
+            const toggle = document.getElementById('accounts-toggle');
+
+            isOpen = !isOpen;
+            list.classList.toggle('visible', isOpen);
+            toggle.classList.toggle('open', isOpen);
+
+            if (isOpen && !loaded) fetchAccounts();
+        }
+
+        async function fetchAccounts() {
+            const stateEl = document.getElementById('accounts-state');
+            try {
+                const res = await fetch('/accounts/get', { method: 'GET' });
+                const data = await res.json();
+                loaded = true;
+                const list = document.getElementById('accounts-list');
+
+                const accounts = data.accounts;
+                if (!accounts || accounts.length === 0) {
+                    stateEl.innerHTML = '<div class="icon">🏦</div>No accounts found.';
+                    return;
+                }
+
+                stateEl.remove();
+
+                accounts.forEach(account => {
+                    const card = document.createElement('a');
+                    card.className = 'account-card';
+                    card.href = `/accounts/${account._id}`;
+
+                    const statusColor = account.status === 'ACTIVE'  ? '#86efac' :
+                                        account.status === 'FROZEN'  ? '#fcd34d' : '#fca5a5';
+
+                    card.innerHTML = `
+                        <div class="account-left">
+                            <div class="account-icon">🏦</div>
+                            <div class="account-info">
+                                <div class="account-name">Account</div>
+                                <div class="account-number">•••• ${String(account.accountNo).slice(-4)}</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div class="account-right">
+                                <div style="font-size:0.75rem;font-weight:600;color:${statusColor};">● ${account.status}</div>
+                                <div style="font-size:0.75rem;color:#9d7fc4;margin-top:2px;">${account.currency || '₹'} · Savings</div>
+                            </div>
+                            <span class="account-arrow">›</span>
+                        </div>
+                    `;
+
+                    list.appendChild(card);
+                });
+
+            } catch (err) {
+                stateEl.innerHTML = '<div class="icon">⚠️</div>Failed to load accounts. Please try again.';
+            }
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    window.location.replace('/login');
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

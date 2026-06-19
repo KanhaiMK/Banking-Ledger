@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Accounts – <%= typeof user !== 'undefined' ? user.name : 'Dashboard' %></title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/uploads/mk-favicon.png">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -315,8 +316,7 @@
                 align-items: center;
                 gap: 8px;
             ">
-                <span style="font-size: 1.3rem; -webkit-text-fill-color: initial;">💳</span>
-                MK_Bank
+                <img src="/images/uploads/mk-favicon.png" style="width: 36px; height: 36px; border-radius: 8px; object-fit: cover;" alt="MK Logo">MK_Bank
             </h2>
         </div>
 

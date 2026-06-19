@@ -4,27 +4,23 @@ const authMiddleware = require('../middleware/auth.middleware')
 const profileController = require("../controllers/profile.controller")
 
 const multer = require('multer')
+const { CloudinaryStorage } = require('multer-storage-cloudinary')
+const cloudinary = require('../config/cloudinary.config')
 const path = require('path')
 
-// Multer config
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'src/public/images/uploads')
-    },
-    filename: function (req, file, cb) {
-        const ext = path.extname(file.originalname)
-        cb(null, `profile-${req.user._id}-${Date.now()}${ext}`)
+// Cloudinary storage config
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'bank-app/profile-pictures',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+        transformation: [{ width: 300, height: 300, crop: 'fill' }]
     }
 })
 
 const upload = multer({
     storage,
-    limits: { fileSize: 2 * 1024 * 1024 }, // 2MB max
-    fileFilter: (req, file, cb) => {
-        const allowed = ['image/jpeg', 'image/png', 'image/webp']
-        if (allowed.includes(file.mimetype)) cb(null, true)
-        else cb(new Error('Only JPEG, PNG and WEBP images are allowed'))
-    }
+    limits: { fileSize: 2 * 1024 * 1024 }
 })
 
 // GET /profile

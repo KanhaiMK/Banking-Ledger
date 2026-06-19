@@ -409,6 +409,7 @@
             const name = document.getElementById('name').value.trim();
             const successEl = document.getElementById('alert-success');
             const errorEl = document.getElementById('alert-error');
+            const saveBtn = document.querySelector('.save-btn');
 
             successEl.style.display = 'none';
             errorEl.style.display = 'none';
@@ -419,28 +420,38 @@
                 return;
             }
 
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+
             const formData = new FormData();
             formData.append('name', name);
             if (newImageFile) formData.append('profilePicture', newImageFile);
             if (deleteImageFlag) formData.append('deleteImage', 'true');
 
-            const res = await fetch('/profile/update', {
-                method: 'POST',
-                body: formData
-            });
+            try {
+                const res = await fetch('/profile/update', {
+                    method: 'POST',
+                    body: formData
+                });
 
-            const data = await res.json();
+                const data = await res.json();
 
-            if (!res.ok) {
-                errorEl.textContent = '⚠ ' + (data.message || 'Something went wrong.');
+                if (!res.ok) {
+                    errorEl.textContent = '⚠ ' + (data.message || 'Something went wrong.');
+                    errorEl.style.display = 'block';
+                } else {
+                    successEl.style.display = 'block';
+                    newImageFile = null;
+                    deleteImageFlag = false;
+                }
+            } catch (err) {
+                errorEl.textContent = '⚠ Network error. Please try again.';
                 errorEl.style.display = 'block';
-                return;
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save Changes';
             }
-
-            successEl.style.display = 'block';
-            newImageFile = null;
-            deleteImageFlag = false;
-        }
+}
 
         window.addEventListener('pageshow', function(event) {
             if (event.persisted) window.location.replace('/profile');

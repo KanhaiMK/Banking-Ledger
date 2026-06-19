@@ -4,7 +4,7 @@ const emailService = require("../services/email.service")
 async function updateChanges(req, res){
     try {
         console.log('body:', req.body)
-    console.log('file:', req.file)
+        console.log('file:', req.file)
         const { name, deleteImage } = req.body
         const updateData = {}
 
@@ -13,7 +13,7 @@ async function updateChanges(req, res){
         if (deleteImage === 'true') {
             updateData.profilePicture = null
         } else if (req.file) {
-            updateData.profilePicture = `/images/uploads/${req.file.filename}`
+            updateData.profilePicture = req.file.path  // Cloudinary URL
         }
 
         await userModel.findByIdAndUpdate(req.user._id, updateData)

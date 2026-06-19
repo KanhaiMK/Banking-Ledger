@@ -280,6 +280,22 @@
         }
 
         .create-btn:active { transform: scale(0.98); }
+        
+        .banner {
+            display: flex;
+            gap: 16px;
+            padding: 24px 32px 0;
+        }
+
+        .banner img {
+            width: 50%;
+            aspect-ratio: 1 / 1;
+            object-fit: contain;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(232,121,249,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
@@ -287,7 +303,21 @@
     <!-- ── Navbar ── -->
     <nav class="navbar">
         <div class="navbar-brand">
-            <h2>💳 MK_Bank</h1>
+            <h2 style="
+                font-size: 1.4rem;
+                font-weight: 900;
+                letter-spacing: 0.02em;
+                background: linear-gradient(135deg, #e879f9 0%, #a855f7 50%, #7c3aed 100%);
+                background-clip: text;
+                color: transparent;
+                text-shadow: 0 0 30px rgba(168,85,247,0.4);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            ">
+                <span style="font-size: 1.3rem; -webkit-text-fill-color: initial;">💳</span>
+                MK_Bank
+            </h2>
         </div>
 
         <div class="navbar-right">
@@ -315,10 +345,10 @@
     </nav>
 
     <!-- ── Banner images ── -->
-    <div class="banner">
-        <img src="/images/uploads/bank.jpg"  alt="Bank" />
-        <img src="/images/uploads/bank2.jpg" alt="Bank" />
-    </div>
+        <div class="banner">
+            <img src="/images/uploads/bank.jpg" alt="Bank" />
+            <img src="/images/uploads/bank2.jpg" alt="Bank" />
+        </div>
 
     <!-- ── Main ── -->
     <div class="main">
